@@ -1,0 +1,950 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- PDF generation libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <title>Eastern Railway Escorting Duty Letter Generator</title>
+    <style>
+        :root {
+            --primary-color: #1a3a6e;
+            --secondary-color: #e3e3e3;
+            --accent-color: #dc3545;
+            --text-color: #333;
+            --light-color: #f8f9fa;
+            --border-radius: 8px;
+            --box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            background-color: #f5f7fa;
+            color: var(--text-color);
+            padding-top: 20px;
+            padding-bottom: 40px;
+        }
+        
+        .container {
+            max-width: 1000px;
+            background-color: white;
+            box-shadow: var(--box-shadow);
+            border-radius: var(--border-radius);
+            padding: 30px;
+            margin-bottom: 30px;
+        }
+        
+        .letter-header {
+            text-align: center;
+            margin-bottom: 30px;
+            border-bottom: 2px solid var(--primary-color);
+            padding-bottom: 15px;
+        }
+        
+        .letter-header h1 {
+            color: var(--primary-color);
+            font-weight: bold;
+            margin: 0;
+            font-size: 28px;
+        }
+        
+        .letter-header p {
+            color: var(--primary-color);
+            font-size: 16px;
+            margin-top: 5px;
+        }
+        
+        .app-title {
+            background-color: var(--primary-color);
+            color: white;
+            text-align: center;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: var(--border-radius);
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            font-weight: 600;
+            color: var(--primary-color);
+            margin-bottom: 8px;
+        }
+        
+        .form-control, .form-select {
+            height: 45px;
+            border-radius: var(--border-radius);
+            border: 1px solid #ddd;
+            box-shadow: inset 0 1px 2px rgba(0,0,0,0.08);
+        }
+        
+        .form-control:focus, .form-select:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 0.25rem rgba(26, 58, 110, 0.25);
+        }
+        
+        .btn {
+            height: 45px;
+            border-radius: var(--border-radius);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            padding: 0 20px;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+        
+        .btn-primary:hover, .btn-primary:focus {
+            background-color: #0d2e5c;
+            border-color: #0d2e5c;
+        }
+        
+        .btn-danger {
+            background-color: var(--accent-color);
+        }
+        
+        .btn-success {
+            background-color: #28a745;
+        }
+        
+        .card {
+            margin-bottom: 20px;
+            border-radius: var(--border-radius);
+            border: none;
+            box-shadow: var(--box-shadow);
+        }
+        
+        .card-header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 15px 20px;
+            font-weight: 600;
+            border-top-left-radius: var(--border-radius) !important;
+            border-top-right-radius: var(--border-radius) !important;
+        }
+        
+        .card-body {
+            padding: 20px;
+        }
+        
+        .staff-selector {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 15px;
+            padding: 15px;
+            background-color: #f8f9fa;
+            border-radius: var(--border-radius);
+        }
+        
+        .staff-selector select {
+            flex: 1;
+        }
+        
+        .table {
+            border-collapse: separate;
+            border-spacing: 0;
+            width: 100%;
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            margin-bottom: 30px;
+        }
+        
+        .table th {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 12px !important;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 14px;
+        }
+        
+        .table td {
+            padding: 12px !important;
+            vertical-align: middle;
+        }
+        
+        .table tbody tr:nth-of-type(odd) {
+            background-color: rgba(0,0,0,0.02);
+        }
+        
+        .staff-list-container {
+            max-height: 400px;
+            overflow-y: auto;
+            border: 1px solid #ddd;
+            border-radius: var(--border-radius);
+            margin-bottom: 30px;
+        }
+        
+        /* Letter output styling */
+        .letter-output {
+            background-color: white;
+            padding: 30px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            margin-top: 40px;
+            position: relative;
+            min-height: 800px;
+        }
+        
+        .letter-output .letter-header {
+            border-bottom: 2px solid var(--primary-color);
+            padding-bottom: 15px;
+        }
+        
+        .letter-output .letter-number,
+        .letter-output .letter-date {
+            font-weight: 600;
+        }
+        
+        .letter-output h3 {
+            margin: 30px 0;
+            color: var(--primary-color);
+        }
+        
+        .signature-block {
+            margin-top: 80px;
+        }
+        
+        .signature-left p,
+        .signature-right p {
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+        
+        .control-number {
+            margin-top: 60px;
+            padding-top: 10px;
+            border-top: 1px solid #ddd;
+        }
+        
+        .action-buttons {
+            margin-top: 30px;
+            display: flex;
+            gap: 15px;
+        }
+        
+        .action-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            padding: 12px 25px;
+            font-weight: 600;
+            border-radius: var(--border-radius);
+        }
+        
+        .tab-navigation {
+            margin-bottom: 30px;
+        }
+        
+        .nav-tabs .nav-link {
+            padding: 15px 20px;
+            font-weight: 600;
+            color: var(--text-color);
+            border: none;
+        }
+        
+        .nav-tabs .nav-link.active {
+            color: var(--primary-color);
+            border-bottom: 3px solid var(--primary-color);
+            background-color: transparent;
+        }
+        
+        .hidden {
+            display: none !important;
+        }
+        
+        /* Mobile responsiveness */
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px 15px;
+            }
+            
+            .staff-selector {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .staff-selector button {
+                margin-top: 10px;
+            }
+            
+            .table-responsive {
+                overflow-x: auto;
+            }
+            
+            .letter-output {
+                padding: 20px 15px;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+            }
+            
+            .action-btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-4">
+        <div class="app-title">
+            <h1><i class="fas fa-train me-2"></i> Eastern Railway</h1>
+            <p>Escorting Duty Letter Generator</p>
+        </div>
+
+        <!-- Tab Navigation -->
+        <ul class="nav nav-tabs tab-navigation" id="myTab" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="form-tab" data-bs-toggle="tab" data-bs-target="#form-pane" type="button" role="tab" aria-controls="form-pane" aria-selected="true">
+                    <i class="fas fa-edit me-2"></i>Create Letter
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="staff-tab" data-bs-toggle="tab" data-bs-target="#staff-pane" type="button" role="tab" aria-controls="staff-pane" aria-selected="false">
+                    <i class="fas fa-users me-2"></i>Staff List
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="preview-tab" data-bs-toggle="tab" data-bs-target="#preview-pane" type="button" role="tab" aria-controls="preview-pane" aria-selected="false">
+                    <i class="fas fa-file-alt me-2"></i>Preview
+                </button>
+            </li>
+        </ul>
+
+        <!-- Tab Content -->
+        <div class="tab-content" id="myTabContent">
+            <!-- Form Tab Pane -->
+            <div class="tab-pane fade show active" id="form-pane" role="tabpanel" aria-labelledby="form-tab">
+                <div class="card">
+                    <div class="card-header">
+                        <i class="fas fa-file-signature me-2"></i> Letter Details
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group mb-3">
+                                    <label for="letterNo">Letter No.</label>
+                                    <input type="text" id="letterNo" value="SCW/JS/2025/05" class="form-control">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group mb-3">
+                                    <label for="letterDate">Date</label>
+                                    <input type="date" id="letterDate" class="form-control">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group mb-3">
+                                    <label for="trainNo">Train No.</label>
+                                    <select id="trainNo" class="form-select">
+                                        <option value="22309 UP/22310 DN">22309 UP/22310 DN (HWH-BGP-HWH)</option>
+                                        <option value="22301 UP/22302 DN">22301 UP/22302 DN (HWH-NJP-HWH)</option>
+                                        <option value="22303 UP/22304 DN">22303 UP/22304 DN (HWH-GAYA-HWH)</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group mb-3">
+                                    <label for="dutyDate">Duty Date</label>
+                                    <input type="date" id="dutyDate" class="form-control">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card mt-4">
+                    <div class="card-header">
+                        <i class="fas fa-user-friends me-2"></i> Select Staff for Duty (Max 5)
+                    </div>
+                    <div class="card-body">
+                        <div id="staffSelection">
+                            <div class="staff-selector">
+                                <select id="staff1" class="staff-select form-select">
+                                    <option value="">Select Staff Member 1</option>
+                                </select>
+                                <button class="btn btn-danger" onclick="removeStaff(1)">
+                                    <i class="fas fa-trash me-1"></i> Remove
+                                </button>
+                            </div>
+                            <div class="staff-selector">
+                                <select id="staff2" class="staff-select form-select">
+                                    <option value="">Select Staff Member 2</option>
+                                </select>
+                                <button class="btn btn-danger" onclick="removeStaff(2)">
+                                    <i class="fas fa-trash me-1"></i> Remove
+                                </button>
+                            </div>
+                        </div>
+                        <button class="btn btn-primary mt-3" onclick="addMoreStaff()">
+                            <i class="fas fa-user-plus me-1"></i> Add More Staff
+                        </button>
+
+                        <div class="mt-4">
+                            <div class="form-group">
+                                <label for="orsPass">ORS Pass Details</label>
+                                <select id="orsPass" class="form-select">
+                                    <option value="SL 01 will avail Card Pass and 02-05 avail ORS Pass of above staff">Sl. 01 will avail Card Pass and 02-05 avail ORS Pass of above staff</option>
+                                    <option value="SL 01-05 will avail ORS Pass of above staff">Sl. 01-05 will avail ORS Pass of above staff</option>
+                                    <option value="SL 01-04 will avail ORS Pass of above staff">Sl. 01-04 will avail ORS Pass of above staff</option>
+                                    <option value="SL 01-03 will avail ORS Pass of above staff">Sl. 01-03 will avail ORS Pass of above staff</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="d-grid gap-2 mt-4">
+                    <button class="btn btn-success btn-lg" onclick="generateLetter()">
+                        <i class="fas fa-file-invoice me-2"></i> Generate Letter
+                    </button>
+                </div>
+            </div>
+
+            <!-- Staff List Tab Pane -->
+            <div class="tab-pane fade" id="staff-pane" role="tabpanel" aria-labelledby="staff-tab">
+                <div class="card">
+                    <div class="card-header">
+                        <i class="fas fa-address-card me-2"></i> Complete Staff Directory
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="staff-list-container">
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>SL NO</th>
+                                            <th>NAME</th>
+                                            <th>DESIG</th>
+                                            <th>D.O.B</th>
+                                            <th>P.F A/C NO</th>
+                                            <th>PHONE NO.</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="fullStaffList">
+                                        <!-- Staff list will be populated here -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Preview Tab Pane -->
+            <div class="tab-pane fade" id="preview-pane" role="tabpanel" aria-labelledby="preview-tab">
+                <div class="alert alert-info mb-4">
+                    <i class="fas fa-info-circle me-2"></i> Generate a letter first to see the preview here.
+                </div>
+                
+                <div id="previewSection" class="d-none">
+                    <h4 class="mb-3">Selected Staff</h4>
+                    <div class="table-responsive">
+                        <table id="staffTable" class="table">
+                            <thead>
+                                <tr>
+                                    <th>SL NO</th>
+                                    <th>NAME</th>
+                                    <th>DESIG</th>
+                                    <th>D.O.B</th>
+                                    <th>P.F A/C NO</th>
+                                    <th>PHONE NO.</th>
+                                </tr>
+                            </thead>
+                            <tbody id="selectedStaff">
+                                <!-- Selected staff will be displayed here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Letter Output Section -->
+        <div id="letterOutput" class="letter-output hidden">
+            <div class="letter-header">
+                <h1>EASTERN RAILWAY</h1>
+            </div>
+            
+            <div class="letter-number">
+                <p id="outputLetterNo"></p>
+            </div>
+            <div class="letter-date">
+                <p id="outputDate"></p>
+            </div>
+            
+            <h3 style="text-align: center;" >NOTE</h3>
+            <p id="outputSubject"></p>
+            <p id="outputBody"></p>
+            <div class="table-responsive">
+                <table id="outputStaffTable" class="table">
+                    <thead>
+                        <tr>
+                            <th>SL NO</th>
+                            <th>NAME</th>
+                            <th>DESIG</th>
+                            <th>D.O.B</th>
+                            <th>P.F A/C NO</th>
+                            <th>PHONE NO.</th>
+                        </tr>
+                    </thead>
+                    <tbody id="outputStaffBody">
+                    </tbody>
+                </table>
+            </div>
+            <p id="outputOrsPass"></p>
+            <p>Submitted for approval Please.</p>
+            
+            <div class="signature-block row mt-5">
+                <div class="signature-left col-6 text-start">
+                    <p style="margin-top: 75px;">AME/JS/HWH</p>
+                </div>
+                <div class="signature-right col-6 text-end">
+                    <p>SUPDT./C&W/JS/HWH</p>
+                </div>
+            </div>
+            
+            <div class="control-number">
+                <p style="position: absolute; bottom: 0; left: 0; width: 100%; text-align: center;">C&W HWH CONTROL NUMBER- 6290733691</p>
+            </div>
+            <div class="action-buttons">
+                <button class="btn btn-primary action-btn" onclick="printLetter()">
+                    <i class="fas fa-print"></i> Print Letter
+                </button>
+                <button class="btn btn-success action-btn" onclick="saveLetter()">
+                    <i class="fas fa-save"></i> Save Letter
+                </button>
+                <button class="btn btn-secondary action-btn" onclick="backToForm()">
+                    <i class="fas fa-arrow-left"></i> Back to Form
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Complete staff data from the provided list
+        const staffData = [
+            {name: "SATADRU HAZRA", designation: "SSE", dob: "05/09/79", pf: "50200066280", phone: "8972469706"},
+            {name: "DEBABRATA MANDAL", designation: "SSE", dob: "09/12/79", pf: "50204751814", phone: "6290730566"},
+            {name: "SANTU DEBNATH", designation: "SSE", dob: "12/10/87", pf: "50200406426", phone: "9330020699"},
+            {name: "RANJEET KUMAR", designation: "SSE", dob: "17/04/85", pf: "50200403157", phone: "9576884085"},
+            {name: "SANJAY MUKHERJEE", designation: "SSE", dob: "08/03/74", pf: "50204720192", phone: "6290730579"},
+			{name: "RAMESH RAJBHAR", designation: "SSE", dob: "14/05/89", pf: "50729801472", phone: "9836120857"},
+            {name: "RAJIB MAJUMDAR", designation: "SSE", dob: "13/11/93", pf: "03229804411", phone: "9477864436"},
+            {name: "ANURAG KUMAR", designation: "SSE", dob: "20/03/90", pf: "50229800135", phone: "7903110506"},
+            {name: "BIPIN BIHAREE SINGH", designation: "SSE", dob: "02/09/95", pf: "03229804425", phone: "9614204020"},
+            {name: "MILON KUMAR BID", designation: "SSE", dob: "07/07/93", pf: "03229804413", phone: "9609443159"},
+            {name: "ABHAY KUMAR", designation: "JE", dob: "07/08/93", pf: "03229805524", phone: "7991183271"},
+            {name: "PANKAJ CHAUPAL", designation: "JE", dob: "11/06/96", pf: "03229805554", phone: "7255081227"},
+            {name: "JAI PRAKASH TIWARI", designation: "JE", dob: "18/10/85", pf: "50200402103", phone: "9836578164"},
+            {name: "CHANDAN KUMAR", designation: "JE", dob: "11/12/86", pf: "50200405335", phone: "7004969455"},
+			{name: "BICKY SAH", designation: "JE", dob: "28/12/93", pf: "03229809372", phone: "8981298544"},
+            {name: "DEBASHIS KAR", designation: "Sr. Tech", dob: "23/11/80", pf: "50204714209", phone: "9088371197"},
+            {name: "BISWAJIT DAS", designation: "Sr. Tech", dob: "03/02/79", pf: "50204712389", phone: "9874178126"},
+            {name: "IMTEYAZ HUSSAIN KHAN", designation: "Sr. Tech", dob: "21/09/78", pf: "502H4770511", phone: "9038773488"},
+            {name: "NASIM AKHTAR", designation: "Sr. Tech", dob: "07/12/76", pf: "50204715251", phone: "8391077708"},
+            {name: "RATAN LAL SHAW", designation: "Sr. Tech", dob: "15/07/73", pf: "502H4763671", phone: "8777083528"},
+            {name: "SUPRIYA JANA", designation: "Sr. Tech", dob: "26/09/85", pf: "50200402104", phone: "9903053907"},
+            {name: "MONOJIT BISWAS", designation: "Sr. Tech", dob: "07/10/83", pf: "50200401466", phone: "7003758216"},
+            {name: "AMAR DEWAN", designation: "Sr. Tech", dob: "05/04/85", pf: "50200402993", phone: "9433317845"},
+            {name: "SANJIB KR. MANDAL", designation: "Sr. Tech", dob: "27/05/86", pf: "50200402032", phone: "9831239838"},
+            {name: "SANJOY BANERJEE", designation: "Sr. Tech", dob: "15/02/87", pf: "50200401464", phone: "7278550152"},
+            {name: "AASIF KHAN", designation: "Sr. Tech", dob: "03/02/91", pf: "50200403279", phone: "6290850815"},
+            {name: "ANINDYA DAS", designation: "Sr. Tech", dob: "28/10/85", pf: "50206806302", phone: "9830784305"},
+            {name: "GOURANGA MONDAL", designation: "Sr. Tech", dob: "12/06/89", pf: "50200404476", phone: "8100565264"},
+            {name: "ARIJIT ROY", designation: "Tech-I", dob: "05/05/83", pf: "50200406023", phone: "8777044116"},
+            {name: "MARSHAL HEMBRAM", designation: "Tech-I", dob: "11/01/96", pf: "50200407661", phone: "7602993011"},
+            {name: "MOZAMMEL", designation: "Tech-I", dob: "01/12/77", pf: "50204708507", phone: "9674230788"},
+            {name: "SUKDEV RAJAK", designation: "Tech-I", dob: "03/01/82", pf: "50200407691", phone: "9732870501"},
+            {name: "AMIT DAS", designation: "Tech-I", dob: "22/04/87", pf: "50200404897", phone: "9088077860"},
+            {name: "BIDYUT PAL", designation: "Tech-I", dob: "05/01/87", pf: "50714202991", phone: "9002006362"},
+            {name: "GAUTAM NASKAR", designation: "Tech-II", dob: "01/01/90", pf: "03229803934", phone: "9734443024"},
+            {name: "SUMIT KUMAR", designation: "Tech-II", dob: "10/02/91", pf: "16413F87937", phone: "9097071811"},
+            {name: "UJJWAL KUMAR", designation: "Tech-II", dob: "17/12/92", pf: "33329805751", phone: "7761911072"},
+            {name: "VICKY KUMAR", designation: "Tech-II", dob: "02/12/97", pf: "07629802841", phone: "6206199578"},
+            {name: "SUBHAJIT GHOSH", designation: "Tech-II", dob: "25/01/94", pf: "03229804476", phone: "8926870514"},
+            {name: "RAVI RANJAN RAM", designation: "Tech-II", dob: "05/11/96", pf: "00329805696", phone: "6206662702"},
+            {name: "KESHAW KUMAR", designation: "Tech-II", dob: "10/01/90", pf: "03229804535", phone: "7488149430"},
+            {name: "VINOD KUMAR PAL", designation: "Tech-II", dob: "", pf: "0032980", phone: ""},
+            {name: "RAJESHWAR PRASAD", designation: "Tech-II", dob: "20/09/88", pf: "03229805189", phone: "8240656873"},
+            {name: "MANISH KUMAR", designation: "Tech-II", dob: "11/05/93", pf: "33729801294", phone: "8240691631"},
+            {name: "JUNAID ANSARI", designation: "Tech-II", dob: "03/02/96", pf: "03229804398", phone: "7870801667"},
+            {name: "NIWAS KUMAR", designation: "Tech-II", dob: "05/02/94", pf: "30229802482", phone: "6200354342"},
+            {name: "ARUN KR. PASWAN", designation: "Tech-III", dob: "15/02/85", pf: "50200408461", phone: "7003358865"},
+            {name: "ANIRBAN GHOSH", designation: "Tech-III", dob: "11/11/91", pf: "50200406428", phone: "8777537951"},
+            {name: "BADAL KUMAR", designation: "Tech-III", dob: "12/12/91", pf: "36529802123", phone: "7070257575"},
+            {name: "VISHWAJEET KUMAR", designation: "Tech-III", dob: "23/03/93", pf: "27315406283", phone: "9113127045"},
+            {name: "RAJAN KUMAR", designation: "Tech-III", dob: "05/09/93", pf: "03229805809", phone: "8084127105"},
+            {name: "SUBEDAR PATEL", designation: "Tech-III", dob: "08/12/93", pf: "03229805819", phone: "8808808382"},
+            {name: "MANISH KUMAR", designation: "Tech-III", dob: "02/01/94", pf: "03229805681", phone: "7091480209"},
+            {name: "ABHISHEK KUMAR", designation: "Tech-III", dob: "12/03/96", pf: "03229805808", phone: "9504298612"},
+            {name: "GAURAV KR. THAKUR", designation: "Tech-III", dob: "12/09/97", pf: "03229805820", phone: "7546807119"},
+            {name: "PIYUSH KUMAR", designation: "Tech-III", dob: "02/10/96", pf: "03229805805", phone: "9122668082"},
+            {name: "IMTIYAZ ANSARI", designation: "Tech-III", dob: "11/02/94", pf: "03229805806", phone: "7903805759"},
+            {name: "SADDAM HOSSEN MONDAL", designation: "Tech-III", dob: "27/06/91", pf: "03229805804", phone: "9002248854"},
+            {name: "AJAY KUMAR MISHRA", designation: "TECH-III", dob: "", pf: "0322980", phone: ""},
+            {name: "PHANTUSH KUMAR", designation: "Asst. C&W", dob: "05/01/90", pf: "333J1300233", phone: "8840171927"},
+            {name: "ANKIT ANAND", designation: "Asst. C&W", dob: "16/02/91", pf: "03229807421", phone: "9507475341"},
+            {name: "RAVI KUMAR", designation: "Asst. C&W", dob: "16/12/89", pf: "03229807367", phone: "9142478784"},
+            {name: "ANKIT KUMAR", designation: "Asst. C&W", dob: "15/01/95", pf: "03229807360", phone: "7362087275"},
+            {name: "GAUTAM KUMAR", designation: "Asst. C&W", dob: "01/01/96", pf: "03229807349", phone: "9123174042"},
+            {name: "PRAKASH Kr. MEHRA", designation: "Asst. C&W", dob: "02/05/87", pf: "03229807352", phone: "8804734453"},
+            {name: "AJAY KR. SHARMA", designation: "Asst. C&W", dob: "31/03/88", pf: "03229807365", phone: "9852570401"},
+            {name: "SAIFUDDIN MONDAL", designation: "Asst. C&W", dob: "01/01/98", pf: "", phone: "9635937579"},
+            {name: "MUKESH KR. RAM", designation: "Asst. C&W", dob: "", pf: "", phone: ""},
+            {name: "ARINDAM MALICK", designation: "Asst. C&W", dob: "", pf: "", phone: ""},
+            {name: "BHASKAR MONDAL", designation: "Asst. C&W", dob: "", pf: "", phone: ""},
+            {name: "MUKESH KUMAR", designation: "Asst. C&W", dob: "", pf: "", phone: ""},
+            {name: "ASHISH BISWAS", designation: "Asst. C&W", dob: "", pf: "", phone: ""},
+            {name: "RAVI KUMAR SINGH", designation: "Asst. C&W", dob: "26/02/1997", pf: "03429803059", phone: "93041"}
+        ];
+
+        // Initialize the application when the page loads
+        window.onload = function() {
+            // Set today's date as default
+            const today = new Date();
+            document.getElementById('letterDate').valueAsDate = today;
+            document.getElementById('dutyDate').valueAsDate = today;
+            
+            // Populate full staff list
+            populateFullStaffList();
+            
+            // Populate staff dropdowns
+            populateStaffDropdowns();
+        };
+
+        // Populate the full staff list table
+        function populateFullStaffList() {
+            const staffListBody = document.getElementById('fullStaffList');
+            staffListBody.innerHTML = '';
+            
+            staffData.forEach((staff, index) => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${index + 1}</td>
+                    <td>${staff.name}</td>
+                    <td>${staff.designation}</td>
+                    <td>${staff.dob}</td>
+                    <td>${staff.pf}</td>
+                    <td>${staff.phone}</td>
+                `;
+                staffListBody.appendChild(row);
+            });
+        }
+
+        // Populate all staff dropdowns with staff data
+        function populateStaffDropdowns() {
+            const dropdowns = document.querySelectorAll('.staff-select');
+            
+            dropdowns.forEach(dropdown => {
+                // Clear existing options except the first one
+                while (dropdown.options.length > 1) {
+                    dropdown.remove(1);
+                }
+                
+                // Add staff options
+                staffData.forEach((staff, index) => {
+                    const option = document.createElement('option');
+                    option.value = index;
+                    option.textContent = `${staff.name} (${staff.designation})`;
+                    dropdown.appendChild(option);
+                });
+            });
+        }
+
+        // Add more staff selection fields (up to 5)
+        function addMoreStaff() {
+            const staffSelection = document.getElementById('staffSelection');
+            const currentCount = staffSelection.children.length;
+            
+            if (currentCount < 5) {
+                const newSelector = document.createElement('div');
+                newSelector.className = 'staff-selector';
+                newSelector.innerHTML = `
+                    <select id="staff${currentCount + 1}" class="staff-select form-select">
+                        <option value="">Select Staff Member ${currentCount + 1}</option>
+                    </select>
+                    <button class="btn btn-danger" onclick="removeStaff(${currentCount + 1})">Remove</button>
+                `;
+                staffSelection.appendChild(newSelector);
+                populateStaffDropdowns();
+            } else {
+                alert('Maximum of 5 staff members can be selected.');
+            }
+        }
+
+        // Remove a staff selection field
+        function removeStaff(index) {
+            const staffSelection = document.getElementById('staffSelection');
+            if (staffSelection.children.length > 1) {
+                staffSelection.removeChild(staffSelection.children[index - 1]);
+                
+                // Renumber the remaining selectors
+                const selectors = staffSelection.querySelectorAll('.staff-selector');
+                selectors.forEach((selector, i) => {
+                    const select = selector.querySelector('select');
+                    select.id = `staff${i + 1}`;
+                    selector.querySelector('button').setAttribute('onclick', `removeStaff(${i + 1})`);
+                    select.querySelector('option').textContent = `Select Staff Member ${i + 1}`;
+                });
+            } else {
+                alert('You need to have at least one staff member selected.');
+            }
+        }
+
+        // Generate the letter
+        function generateLetter() {
+            // Validate required fields
+            if (!validateForm()) {
+                return;
+            }
+            
+            // Get selected staff
+            const selectedStaff = [];
+            const dropdowns = document.querySelectorAll('.staff-select');
+            
+            dropdowns.forEach(dropdown => {
+                if (dropdown.value !== "") {
+                    const staff = staffData[dropdown.value];
+                    selectedStaff.push(staff);
+                }
+            });
+            
+            if (selectedStaff.length === 0) {
+                alert('Please select at least one staff member.');
+                return;
+            }
+            
+            // Show selected staff in the table
+            const staffTableBody = document.getElementById('selectedStaff');
+            staffTableBody.innerHTML = '';
+            
+            selectedStaff.forEach((staff, index) => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${index + 1}</td>
+                    <td>${staff.name}</td>
+                    <td>${staff.designation}</td>
+                    <td>${staff.dob}</td>
+                    <td>${staff.pf}</td>
+                    <td>${staff.phone}</td>
+                `;
+                staffTableBody.appendChild(row);
+            });
+            
+            document.getElementById('staffTable').classList.remove('hidden');
+            
+            // Generate the letter content
+            const letterNo = document.getElementById('letterNo').value;
+            const letterDate = formatDate(document.getElementById('letterDate').valueAsDate);
+            const trainNo = document.getElementById('trainNo').value;
+            const dutyDate = formatDate(document.getElementById('dutyDate').valueAsDate);
+            const orsPass = document.getElementById('orsPass').value;
+            
+            document.getElementById('outputLetterNo').textContent = `L No. ${letterNo}`;
+            document.getElementById('outputDate').textContent = `DATED- ${letterDate}`;
+            
+            // Get route based on train number
+            let route = "";
+            if (trainNo === "22301 UP/22302 DN") {
+                route = "Ex HWH to NJP & back";
+            } else if (trainNo === "22303 UP/22304 DN") {
+                route = "Ex HWH to GAYA & back";
+            } else if (trainNo === "22309 UP/22310 DN") {
+                route = "Ex HWH to BGP & back";
+            }
+            
+            document.getElementById('outputSubject').textContent = `Sub: Booking of SSE/JE/Staff for escorting duty in Train No. ${trainNo} ${route}`;
+            
+            document.getElementById('outputBody').textContent = 
+                `As per order of Sr.DME/Chg. & Trainset/HWH, the following SSE/JE/Staff working under SCW/JS are being booked on ${dutyDate} for escorting duty in Train no. ${trainNo} VANDE BHARAT EXP. ${route}.`;
+            
+            // Populate staff table in letter
+            const outputStaffBody = document.getElementById('outputStaffBody');
+            outputStaffBody.innerHTML = '';
+            
+            selectedStaff.forEach((staff, index) => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${index + 1}</td>
+                    <td>${staff.name}</td>
+                    <td>${staff.designation}</td>
+                    <td>${staff.dob}</td>
+                    <td>${staff.pf}</td>
+                    <td>${staff.phone}</td>
+                `;
+                outputStaffBody.appendChild(row);
+            });
+            
+            document.getElementById('outputOrsPass').textContent = `** ${orsPass}`;
+            
+            // Show the letter
+            document.getElementById('letterOutput').classList.remove('hidden');
+        }
+
+        // Validate form fields
+        function validateForm() {
+            let isValid = true;
+            const letterNo = document.getElementById('letterNo').value.trim();
+            const letterDate = document.getElementById('letterDate').value;
+            const trainNo = document.getElementById('trainNo').value;
+            const dutyDate = document.getElementById('dutyDate').value;
+            const selectedStaff = document.querySelectorAll('.staff-select');
+            let staffSelected = false;
+            
+            // Check if letter number is provided
+            if (letterNo === "") {
+                isValid = false;
+                alert('Please enter the Letter No.');
+                return false;
+            }
+            
+            // Check if letter date is selected
+            if (letterDate === "") {
+                isValid = false;
+                alert('Please select the Letter Date.');
+                return false;
+            }
+            
+            // Check if train number is selected
+            if (trainNo === "") {
+                isValid = false;
+                alert('Please select the Train No.');
+                return false;
+            }
+            
+            // Check if duty date is selected
+            if (dutyDate === "") {
+                isValid = false;
+                alert('Please select the Duty Date.');
+                return false;
+            }
+            
+            // Check if at least one staff member is selected
+            selectedStaff.forEach(select => {
+                if (select.value !== "") {
+                    staffSelected = true;
+                }
+            });
+            
+            if (!staffSelected) {
+                isValid = false;
+                alert('Please select at least one staff member for duty.');
+                return false;
+            }
+            
+            // Validate for duplicate staff selections
+            const selectedValues = Array.from(selectedStaff)
+                .filter(select => select.value !== "")
+                .map(select => select.value);
+                
+            const uniqueValues = new Set(selectedValues);
+            if (uniqueValues.size !== selectedValues.length) {
+                isValid = false;
+                alert('You have selected the same staff member multiple times. Please ensure each staff member is selected only once.');
+                return false;
+            }
+            
+            return isValid;
+        }
+
+        // Format date as DD-MM-YYYY
+        function formatDate(date) {
+            if (!date) return '';
+            
+            const day = String(date.getDate()).padStart(2, '0');
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const year = date.getFullYear();
+            
+            return `${day}/${month}/${year}`;
+        }
+
+        // Print the letter
+        function printLetter() {
+            const printContent = document.getElementById('letterOutput').innerHTML;
+            const originalContent = document.body.innerHTML;
+            
+            document.body.innerHTML = printContent;
+            window.print();
+            document.body.innerHTML = originalContent;
+        }
+
+        // Save the letter as a PDF file
+        function saveLetter() {
+            const { jsPDF } = window.jspdf;
+            const letterElem = document.getElementById('letterOutput');
+            
+            // Temporarily remove the print and save buttons from the output
+            const printButton = letterElem.querySelector('button[onclick="printLetter()"]');
+            const saveButton = letterElem.querySelector('button[onclick="saveLetter()"]');
+            
+            printButton.style.display = 'none';
+            saveButton.style.display = 'none';
+            
+            html2canvas(letterElem, {
+                scale: 2, // Higher scale for better quality
+                logging: false,
+                useCORS: true
+            }).then(canvas => {
+                const imgData = canvas.toDataURL('image/png');
+                const pdf = new jsPDF('p', 'mm', 'a4');
+                
+                // Calculate dimensions to fit A4 page
+                const imgWidth = 210; // A4 width in mm
+                const pageHeight = 297; // A4 height in mm
+                const imgHeight = canvas.height * imgWidth / canvas.width;
+                
+                let heightLeft = imgHeight;
+                let position = 0;
+                
+                // Add first page
+                pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+                heightLeft -= pageHeight;
+                
+                // Add additional pages if needed
+                while (heightLeft > 0) {
+                    position = heightLeft - imgHeight;
+                    pdf.addPage();
+                    pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+                    heightLeft -= pageHeight;
+                }
+                
+                // Get duty date to include in filename
+                const dutyDate = formatDate(document.getElementById('dutyDate').valueAsDate).replace(/\//g, '-');
+                const trainNo = document.getElementById('trainNo').value.split(' ')[0];
+                
+                // Save the PDF
+                pdf.save(`Escorting_Duty_${trainNo}_${dutyDate}.pdf`);
+                
+                // Restore the buttons
+                printButton.style.display = '';
+                saveButton.style.display = '';
+            });
+        }
+
+        // Back to form tab
+        function backToForm() {
+            const formTab = new bootstrap.Tab(document.getElementById('form-tab'));
+            formTab.show();
+        }
+    </script>
+</body>
+</html>
