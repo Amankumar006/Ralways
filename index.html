@@ -879,12 +879,60 @@
 
         // Print the letter
         function printLetter() {
-            const printContent = document.getElementById('letterOutput').innerHTML;
+            // Store original content
             const originalContent = document.body.innerHTML;
             
-            document.body.innerHTML = printContent;
+            // Clone the letter element to avoid modifying the original
+            const printContent = document.getElementById('letterOutput').cloneNode(true);
+            
+            // Remove action buttons before printing
+            const actionButtons = printContent.querySelector('.action-buttons');
+            if (actionButtons) {
+                actionButtons.style.display = 'none';
+            }
+            
+            // Create a new body with just our print content
+            const newBody = document.createElement('body');
+            newBody.appendChild(printContent);
+            printContent.classList.remove('hidden');
+            
+            // Apply print-specific styling
+            const style = document.createElement('style');
+            style.textContent = `
+                @media print {
+                    body { margin: 0; padding: 0; }
+                    .letter-output { 
+                        box-shadow: none; 
+                        border-radius: 0;
+                        padding: 20px;
+                    }
+                    .control-number p {
+                        position: fixed;
+                        bottom: 10px;
+                        left: 0;
+                        width: 100%;
+                        text-align: center;
+                    }
+                }
+            `;
+            newBody.appendChild(style);
+            
+            // Replace body content with our print-ready content
+            document.body.innerHTML = newBody.innerHTML;
+            
+            // Print the document
             window.print();
+            
+            // Restore original content after printing
             document.body.innerHTML = originalContent;
+            
+            // Re-initialize any event listeners that may have been lost
+            const formTab = document.getElementById('form-tab');
+            if (formTab) {
+                formTab.addEventListener('click', function() {
+                    new bootstrap.Tab(formTab).show();
+                });
+            }
         }
 
         // Save the letter as a PDF file
