@@ -305,7 +305,7 @@
             <h1><i class="fas fa-train me-2"></i> Eastern Railway</h1>
             <p>Escorting Duty Letter Generator</p>
         </div>
-
+        
         <!-- Tab Navigation -->
         <ul class="nav nav-tabs tab-navigation" id="myTab" role="tablist">
             <li class="nav-item" role="presentation">
@@ -892,20 +892,30 @@
             const { jsPDF } = window.jspdf;
             const letterElem = document.getElementById('letterOutput');
             
-            // Temporarily remove the print and save buttons from the output
-            const printButton = letterElem.querySelector('button[onclick="printLetter()"]');
-            const saveButton = letterElem.querySelector('button[onclick="saveLetter()"]');
+            // Temporarily remove the action buttons from the output
+            const actionButtons = letterElem.querySelector('.action-buttons');
+            actionButtons.style.display = 'none';
             
-            printButton.style.display = 'none';
-            saveButton.style.display = 'none';
-            
+            // Optimize image quality and resolution for smaller file size
             html2canvas(letterElem, {
-                scale: 2, // Higher scale for better quality
+                scale: 1.5, // Reduced from 2 to 1.5 for smaller file size
                 logging: false,
-                useCORS: true
+                useCORS: true,
+                imageTimeout: 0,
+                backgroundColor: '#ffffff',
+                // Add image optimization
+                allowTaint: true,
+                removeContainer: true,
+                // Compress the output
+                quality: 0.9 // 90% quality - good balance between quality and file size
             }).then(canvas => {
-                const imgData = canvas.toDataURL('image/png');
-                const pdf = new jsPDF('p', 'mm', 'a4');
+                const imgData = canvas.toDataURL('image/jpeg', 0.85); // Use JPEG instead of PNG for smaller size
+                const pdf = new jsPDF({
+                    orientation: 'portrait',
+                    unit: 'mm',
+                    format: 'a4',
+                    compress: true // Enable compression
+                });
                 
                 // Calculate dimensions to fit A4 page
                 const imgWidth = 210; // A4 width in mm
@@ -916,14 +926,14 @@
                 let position = 0;
                 
                 // Add first page
-                pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+                pdf.addImage(imgData, 'JPEG', 0, position, imgWidth, imgHeight, undefined, 'FAST');
                 heightLeft -= pageHeight;
                 
                 // Add additional pages if needed
                 while (heightLeft > 0) {
                     position = heightLeft - imgHeight;
                     pdf.addPage();
-                    pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+                    pdf.addImage(imgData, 'JPEG', 0, position, imgWidth, imgHeight, undefined, 'FAST');
                     heightLeft -= pageHeight;
                 }
                 
@@ -931,12 +941,19 @@
                 const dutyDate = formatDate(document.getElementById('dutyDate').valueAsDate).replace(/\//g, '-');
                 const trainNo = document.getElementById('trainNo').value.split(' ')[0];
                 
-                // Save the PDF
+                // Optimize PDF before saving
+                pdf.setProperties({
+                    title: `Escorting Duty Letter ${trainNo} ${dutyDate}`,
+                    subject: 'Eastern Railway Escorting Duty',
+                    creator: 'ER Letter Generator',
+                    author: 'Eastern Railway'
+                });
+                
+                // Save the PDF with compression
                 pdf.save(`Escorting_Duty_${trainNo}_${dutyDate}.pdf`);
                 
                 // Restore the buttons
-                printButton.style.display = '';
-                saveButton.style.display = '';
+                actionButtons.style.display = '';
             });
         }
 
