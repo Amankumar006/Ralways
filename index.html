@@ -10,7 +10,7 @@
     <!-- PDF generation libraries -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-    <title>Eastern Railway Escorting Duty Letter Generator</title>
+    <title>Eastern Railway Escorting Duty Letter</title>
     <style>
         :root {
             --primary-color: #1a3a6e;
@@ -199,7 +199,7 @@
         }
         
         .letter-output .letter-header {
-            border-bottom: 2px solid var(--primary-color);
+            border-bottom: 2px solid #fff;
             padding-bottom: 15px;
         }
         
@@ -341,7 +341,7 @@
                                     <input type="text" id="letterNo" value="SCW/JS/2025/05" class="form-control">
                                 </div>
                             </div>
-                            <div class="col-md-6">
+                            <div class="col-md-6 text-end">
                                 <div class="form-group mb-3">
                                     <label for="letterDate">Date</label>
                                     <input type="date" id="letterDate" class="form-control">
@@ -482,11 +482,17 @@
                 <h1>EASTERN RAILWAY</h1>
             </div>
             
-            <div class="letter-number">
-                <p id="outputLetterNo"></p>
-            </div>
-            <div class="letter-date">
-                <p id="outputDate"></p>
+            <div class="row">
+                <div class="col-6">
+                    <div class="letter-number">
+                        <p id="outputLetterNo"></p>
+                    </div>
+                </div>
+                <div class="col-6 text-end">
+                    <div class="letter-date">
+                        <p id="outputDate"></p>
+                    </div>
+                </div>
             </div>
             
             <h3 style="text-align: center;" >NOTE</h3>
@@ -900,18 +906,54 @@
             const style = document.createElement('style');
             style.textContent = `
                 @media print {
-                    body { margin: 0; padding: 0; }
+                    body { 
+                        margin: 0; 
+                        padding: 0; 
+                        font-size: 12px; 
+                    }
                     .letter-output { 
                         box-shadow: none; 
                         border-radius: 0;
-                        padding: 20px;
+                        padding: 10px;
+                        min-height: auto;
+                    }
+                    .letter-header {
+                        margin-bottom: 15px;
+                        padding-bottom: 10px;
+                    }
+                    .letter-header h1 {
+                        font-size: 22px;
+                    }
+                    h3 {
+                        margin: 15px 0 !important;
+                        font-size: 16px;
+                    }
+                    p {
+                        margin-bottom: 8px;
+                    }
+                    .table {
+                        margin-bottom: 10px;
+                    }
+                    .table th, .table td {
+                        padding: 5px !important;
+                        font-size: 11px;
+                    }
+                    .signature-block {
+                        margin-top: 20px;
+                    }
+                    .signature-left p {
+                        margin-top: 35px !important;
+                    }
+                    .control-number {
+                        margin-top: 20px;
                     }
                     .control-number p {
                         position: fixed;
-                        bottom: 10px;
+                        bottom: 5px;
                         left: 0;
                         width: 100%;
                         text-align: center;
+                        font-size: 10px;
                     }
                 }
             `;
